@@ -1,4 +1,7 @@
 {
   "name": "CDPRNBare",
-  "displayName": "CDPRNBare"
+  "displayName": "CDPRNBare",
+  "plugins": [
+    "expo-secure-store"
+  ]
 }
