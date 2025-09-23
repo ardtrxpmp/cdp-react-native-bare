@@ -1,97 +1,94 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# CDP React Native Demo
 
-# Getting Started
+This repo demonstrates how to use the CDP Embedded Wallet SDK in a bare React Native app.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+These were the steps taken to get this project working:
 
-## Step 1: Start Metro
-
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
-
-To start the Metro dev server, run the following command from the root of your React Native project:
+1. Initialized the project.
 
 ```sh
-# Using npm
-npm start
-
-# OR using Yarn
-yarn start
+npx @react-native-community/cli@latest init CDPRNBare
 ```
 
-## Step 2: Build and run your app
-
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
+2. Opened the project in Xcode and setup code signing to run on-device.
 
 ```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
+xed ios
 ```
 
-### iOS
+3. Followed [Install Expo modules in an existing React Native project](https://docs.expo.dev/bare/installing-expo-modules/#automatic-installation) to setup the project to work with Expo modules.
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+   a. Installed Expo CLI.
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+   ```sh
+   npx install-expo-modules@latest
+   ```
+
+   Then selected 'Y' to install Expo CLI.
+
+   b. NOTE: This simply sets the project up to work with Expo packages, but it does not use Expo to manage the React Native project. The CDP SDK has a peer dependency on `expo-secure-store`.
+
+4. Installed NPM dependencies:
 
 ```sh
-bundle install
+npm install @coinbase/cdp-hooks react-native-quick-crypto react-native-get-random-values react-native-url-polyfill @react-native-async-storage/async-storage @ungap/structured-clone text-encoding viem
 ```
 
-Then, and every time you update your native dependencies, run:
+5. Installed Expo dependencies:
 
 ```sh
-bundle exec pod install
+npx expo install expo-secure-store@^15 expo-clipboard
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+NOTE: `expo-clipboard` is just used in the application, it is not strictly necessary for the CDP SDK to work.
+
+6. Added the polyfills in `index.js`:
+
+```js
+import structuredClone from '@ungap/structured-clone';
+import { install } from 'react-native-quick-crypto';
+import 'react-native-get-random-values';
+import 'text-encoding';
+import 'react-native-url-polyfill/auto';
+
+// eslint-disable-next-line no-undef
+if (!('structuredClone' in globalThis)) {
+  // eslint-disable-next-line no-undef
+  globalThis.structuredClone = structuredClone;
+}
+
+install();
+```
+
+7. Ensured native dependencies are installed and built.
 
 ```sh
-# Using npm
+cd ios
+pod install
+```
+
+8. Ran `npm run ios` to build and run the project.
+
+```sh
 npm run ios
-
-# OR using Yarn
-yarn ios
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+9. At this point, sanity checked that the project still builds and runs.
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+   a. In one terminal window start the Metro bundler
 
-## Step 3: Modify your app
+   ```sh
+   npm start
+   ```
 
-Now that you have successfully run the app, let's make changes!
+   b. In another terminal window, build the iOS app.
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+   ```sh
+   npx react-native run-ios
+   ```
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+10. Copied ALL starter code from [CDP React Native Starter](https://github.com/coinbase/demo-react-native-expo).
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+11. Filled in CDP project id in `App.tsx` (replace `REPLACE_ME` with the project id).
 
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+12. At this point the project should build and run, and the user should be able to sign in with email or SMS.
