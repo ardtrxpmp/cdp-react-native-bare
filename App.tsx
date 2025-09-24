@@ -8,6 +8,7 @@ import {
   useIsSignedIn,
   useSignOut,
 } from '@coinbase/cdp-hooks';
+import Config from 'react-native-config';
 import { useState } from 'react';
 import {
   StyleSheet,
@@ -313,10 +314,14 @@ function CDPApp() {
  * @returns {JSX.Element} The rendered main component
  */
 export default function App() {
+  if (!Config.CDP_PROJECT_ID) {
+    throw new Error('CDP_PROJECT_ID is not set in `.env` file');
+  }
+
   return (
     <CDPHooksProvider
       config={{
-        projectId: 'REPLACE_ME',
+        projectId: Config.CDP_PROJECT_ID,
         ethereum: {
           createOnLogin: 'smart',
         },

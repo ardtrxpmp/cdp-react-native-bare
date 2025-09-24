@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
+  ScrollView,
 } from "react-native";
 import { useTheme } from "../theme/ThemeContext";
 import { SignInModalProps } from "../types";
@@ -45,6 +46,7 @@ export const SignInModal: React.FC<SignInModalProps> = ({
         borderTopRightRadius: 16,
         minHeight: "60%",
         maxHeight: "90%",
+        flex: 1,
       },
       modalContent: {
         flex: 1,
@@ -221,65 +223,88 @@ export const SignInModal: React.FC<SignInModalProps> = ({
         >
           <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={styles.modalContent}
+            style={{ flex: 1 }}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
           >
             <TouchableOpacity style={styles.modalCloseButton} onPress={onClose}>
               <Text style={styles.modalCloseText}>×</Text>
             </TouchableOpacity>
 
-            <View style={styles.modalHeader}>
-              <View style={styles.logoCircle}>
-                <Text style={styles.logoText}>C</Text>
-              </View>
-              <Text style={styles.modalTitle}>
-                {flowId ? "Enter verification code" : "Sign in"}
-              </Text>
-            </View>
-
-            {flowId ? (
-              <View style={styles.modalForm}>
-                <Text style={styles.inputLabel}>Verification code</Text>
-                <TextInput
-                  style={styles.modalInput}
-                  value={otp}
-                  onChangeText={setOtp}
-                  placeholder="Enter 6-digit code"
-                  keyboardType="number-pad"
-                  maxLength={6}
-                  editable={!isLoading}
-                  placeholderTextColor={colors.textSecondary}
-                  returnKeyType="done"
-                  onSubmitEditing={onVerifyOTP}
-                  blurOnSubmit={true}
-                />
-
-                <TouchableOpacity
-                  style={[styles.continueButton, isLoading && styles.buttonDisabled]}
-                  onPress={onVerifyOTP}
-                  disabled={isLoading}
-                >
-                  <Text style={styles.continueButtonText}>
-                    {isLoading ? "Verifying..." : "Continue"}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <View style={styles.modalForm}>
-                <Text style={styles.inputLabel}>
-                  {authMethod === "email" ? "Email address" : "Phone number"}
+            <ScrollView
+              style={{ flex: 1 }}
+              contentContainerStyle={styles.modalContent}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+            >
+              <View style={styles.modalHeader}>
+                <View style={styles.logoCircle}>
+                  <Text style={styles.logoText}>C</Text>
+                </View>
+                <Text style={styles.modalTitle}>
+                  {flowId ? "Enter verification code" : "Sign in"}
                 </Text>
-                {authMethod === "sms" ? (
-                  <View style={styles.inputContainer}>
-                    <View style={styles.flagContainer}>
-                      <Text style={styles.flagText}>🇺🇸</Text>
-                      <Text style={styles.countryCode}>+1</Text>
+              </View>
+
+              {flowId ? (
+                <View style={styles.modalForm}>
+                  <Text style={styles.inputLabel}>Verification code</Text>
+                  <TextInput
+                    style={styles.modalInput}
+                    value={otp}
+                    onChangeText={setOtp}
+                    placeholder="Enter 6-digit code"
+                    keyboardType="number-pad"
+                    maxLength={6}
+                    editable={!isLoading}
+                    placeholderTextColor={colors.textSecondary}
+                    returnKeyType="done"
+                    onSubmitEditing={onVerifyOTP}
+                    blurOnSubmit={true}
+                  />
+
+                  <TouchableOpacity
+                    style={[styles.continueButton, isLoading && styles.buttonDisabled]}
+                    onPress={onVerifyOTP}
+                    disabled={isLoading}
+                  >
+                    <Text style={styles.continueButtonText}>
+                      {isLoading ? "Verifying..." : "Continue"}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <View style={styles.modalForm}>
+                  <Text style={styles.inputLabel}>
+                    {authMethod === "email" ? "Email address" : "Phone number"}
+                  </Text>
+                  {authMethod === "sms" ? (
+                    <View style={styles.inputContainer}>
+                      <View style={styles.flagContainer}>
+                        <Text style={styles.flagText}>🇺🇸</Text>
+                        <Text style={styles.countryCode}>+1</Text>
+                      </View>
+                      <TextInput
+                        style={styles.phoneInput}
+                        value={phoneNumber}
+                        onChangeText={setPhoneNumber}
+                        placeholder="(000) 000-0000"
+                        keyboardType="phone-pad"
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        editable={!isLoading}
+                        placeholderTextColor={colors.textSecondary}
+                        returnKeyType="done"
+                        onSubmitEditing={onSignIn}
+                        blurOnSubmit={true}
+                      />
                     </View>
+                  ) : (
                     <TextInput
-                      style={styles.phoneInput}
-                      value={phoneNumber}
-                      onChangeText={setPhoneNumber}
-                      placeholder="(000) 000-0000"
-                      keyboardType="phone-pad"
+                      style={styles.modalInput}
+                      value={email}
+                      onChangeText={setEmail}
+                      placeholder="name@example.com"
+                      keyboardType="email-address"
                       autoCapitalize="none"
                       autoCorrect={false}
                       editable={!isLoading}
@@ -288,52 +313,37 @@ export const SignInModal: React.FC<SignInModalProps> = ({
                       onSubmitEditing={onSignIn}
                       blurOnSubmit={true}
                     />
+                  )}
+
+                  <TouchableOpacity
+                    style={[styles.continueButton, isLoading && styles.buttonDisabled]}
+                    onPress={onSignIn}
+                    disabled={isLoading}
+                  >
+                    <Text style={styles.continueButtonText}>
+                      {isLoading ? "Sending..." : "Continue"}
+                    </Text>
+                  </TouchableOpacity>
+
+                  <View style={styles.dividerContainer}>
+                    <View style={styles.dividerLine} />
+                    <Text style={styles.dividerText}>OR</Text>
+                    <View style={styles.dividerLine} />
                   </View>
-                ) : (
-                  <TextInput
-                    style={styles.modalInput}
-                    value={email}
-                    onChangeText={setEmail}
-                    placeholder="name@example.com"
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    editable={!isLoading}
-                    placeholderTextColor={colors.textSecondary}
-                    returnKeyType="done"
-                    onSubmitEditing={onSignIn}
-                    blurOnSubmit={true}
-                  />
-                )}
 
-                <TouchableOpacity
-                  style={[styles.continueButton, isLoading && styles.buttonDisabled]}
-                  onPress={onSignIn}
-                  disabled={isLoading}
-                >
-                  <Text style={styles.continueButtonText}>
-                    {isLoading ? "Sending..." : "Continue"}
-                  </Text>
-                </TouchableOpacity>
-
-                <View style={styles.dividerContainer}>
-                  <View style={styles.dividerLine} />
-                  <Text style={styles.dividerText}>OR</Text>
-                  <View style={styles.dividerLine} />
+                  <TouchableOpacity
+                    style={styles.phoneButton}
+                    onPress={onAuthMethodToggle}
+                    disabled={isLoading}
+                  >
+                    <Text style={styles.phoneIcon}>{authMethod === "email" ? "📞" : "✉️"}</Text>
+                    <Text style={styles.phoneButtonText}>
+                      Continue with {authMethod === "email" ? "phone" : "email"}
+                    </Text>
+                  </TouchableOpacity>
                 </View>
-
-                <TouchableOpacity
-                  style={styles.phoneButton}
-                  onPress={onAuthMethodToggle}
-                  disabled={isLoading}
-                >
-                  <Text style={styles.phoneIcon}>{authMethod === "email" ? "📞" : "✉️"}</Text>
-                  <Text style={styles.phoneButtonText}>
-                    Continue with {authMethod === "email" ? "phone" : "email"}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            )}
+              )}
+            </ScrollView>
           </KeyboardAvoidingView>
         </Animated.View>
       </View>
